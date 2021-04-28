@@ -107,6 +107,7 @@ func (w *Ws) autoReconnect() {
 	for {
 		time.Sleep(10 * time.Second)
 		if !w.websocketErr {
+			fmt.Println("hallo3")
 			continue
 		}
 		fmt.Println("hallo1")
