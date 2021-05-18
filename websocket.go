@@ -1,6 +1,7 @@
 /*
 Websocket package for Resato
 */
+
 package websocket
 
 import (
@@ -13,10 +14,6 @@ import (
 	"net/url"
 	"time"
 )
-
-//todo
-//Error log
-//Check error json
 
 type Ws struct {
 	// the websocket connection
@@ -62,8 +59,7 @@ var upgrader = websocket.Upgrader{
 func (w *Ws) CreateConnection(rW http.ResponseWriter, r *http.Request) error {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
-	// upgrade this connection to a WebSocket
-	// connection
+	// upgrade this connection to a WebSocket connection
 	conn, err := upgrader.Upgrade(rW, r, nil)
 	if err != nil {
 		return err
@@ -104,22 +100,16 @@ func (w *Ws) Reconnect(b bool) {
 }
 
 func (w *Ws) autoReconnect() {
-	for {
-		time.Sleep(10 * time.Second)
+	for range time.Tick(time.Second * 15){
 		if !w.websocketErr {
-			fmt.Println("hallo3")
 			continue
 		}
-		fmt.Println("hallo1")
 		err := w.dial()
 		if err != nil {
-			fmt.Println(err)
-			//todo read error
 			continue
 		}
 		//Connection succeeded
-		//w.WriteHistory()
-		fmt.Println("hallo2")
+		w.WriteHistory()
 		w.websocketErr = false
 	}
 }
@@ -133,6 +123,7 @@ func (w *Ws) CheckConnection() {
 		}
 	}
 }
+
 
 // Appends a cert to pool
 func (w *Ws) AppendCert(cert []byte) {
@@ -175,11 +166,10 @@ func (w *Ws) WriteMessage(messageType int, data []byte) error {
 	return err
 }
 
-//todo fix errorcheck
-
 //Write a message in json format
 func (w *Ws) WriteJSON(data interface{}) error {
 	err := w.conn.WriteJSON(data)
+	fmt.Println(err)
 	if err != nil {
 		w.websocketErr = true
 		w.messages = append(w.messages, historyMessage{
@@ -193,11 +183,8 @@ func (w *Ws) WriteJSON(data interface{}) error {
 }
 
 func (w *Ws) WriteHistory() {
-	for k, v := range w.messages {
-		if time.Now().Unix()-v.time >= 5 {
-			w.messages = append(w.messages[:k], w.messages[k+1:]...)
-			continue
-		}
+	for _, v := range w.messages {
+		fmt.Println(v)
 		if v.messageType == "msg" {
 			w.WriteMessage(1, v.messageByte)
 		} else if v.messageType == "json" {
@@ -217,13 +204,13 @@ func (w *Ws) Read() (int, []byte, error) {
 	return t, d, nil
 }
 
-//todo fix errorcheck
-
 // Read a websocket message in json format
 func (w *Ws) ReadJSON(v interface{}) error {
 	err := w.conn.ReadJSON(v)
+	fmt.Println(err, "sdadsad")
 	if err != nil {
 		w.websocketErr = true
+		fmt.Println(err)
 		return err
 	}
 	return err
