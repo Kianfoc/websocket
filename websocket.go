@@ -169,7 +169,6 @@ func (w *Ws) WriteMessage(messageType int, data []byte) error {
 //Write a message in json format
 func (w *Ws) WriteJSON(data interface{}) error {
 	err := w.conn.WriteJSON(data)
-	fmt.Println(err)
 	if err != nil {
 		w.websocketErr = true
 		w.messages = append(w.messages, historyMessage{
@@ -184,7 +183,6 @@ func (w *Ws) WriteJSON(data interface{}) error {
 
 func (w *Ws) WriteHistory() {
 	for _, v := range w.messages {
-		fmt.Println(v)
 		if v.messageType == "msg" {
 			w.WriteMessage(1, v.messageByte)
 		} else if v.messageType == "json" {
@@ -207,7 +205,6 @@ func (w *Ws) Read() (int, []byte, error) {
 // Read a websocket message in json format
 func (w *Ws) ReadJSON(v interface{}) error {
 	err := w.conn.ReadJSON(v)
-	fmt.Println(err, "sdadsad")
 	if err != nil {
 		w.websocketErr = true
 		fmt.Println(err)
