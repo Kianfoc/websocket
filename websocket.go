@@ -159,7 +159,6 @@ func (w *Ws) SetSecure(b bool) {
 // Write a message
 func (w *Ws) WriteMessage(messageType int, data []byte) error {
     w.mu.Lock()
-    fmt.Println("test")
     err := w.conn.WriteMessage(messageType, data)
     if err != nil {
         w.websocketErr = true
@@ -178,7 +177,6 @@ func (w *Ws) WriteMessage(messageType int, data []byte) error {
 //Write a message in json format
 func (w *Ws) WriteJSON(data interface{}) error {
     w.mu.Lock()
-    fmt.Println("test2")
     err := w.conn.WriteJSON(data)
     if err != nil {
         w.websocketErr = true
